@@ -1,9 +1,11 @@
-version: '2'
+version: '3.8'
 
 services:
   
   # database service
   db:
+    container_name: db
+    hostname: db
     image: mongo:3.6
     ports:
       - "27017:27017"
@@ -11,8 +13,35 @@ services:
       - ./data/mongodb:/data/db
     command: --smallfiles
 
+  redisdb:
+    container_name: redisdb
+    hostname: redisdb
+    image: redis:7.2.4
+    env_file:
+      local.env
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./data/redisdb:/data
+    command: redis-server --save 20 1 --loglevel warning
+
+  celery-worker:
+    container_name: celery-worker
+    hostname: celery-worker
+    build: .
+    command: celery --app app.celery worker --loglevel=info --logfile=/var/log/scaffolding/celery-worker.log
+    env_file:
+      local.env
+    volumes:
+      - ./src/:/code
+      - ./logs:/var/log/scaffolding
+    depends_on:
+      - redisdb
+
   # web service for flask application
   web:
+    container_name: web
+    hostname: web
     build:
       context: .
       dockerfile: Dockerfile
@@ -30,3 +59,4 @@ services:
       - "8400:5000"
     depends_on:
       - db
+      - redisdb

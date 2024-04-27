@@ -3,12 +3,28 @@ from flask import Flask
 import os
 import logging.config
 import mongoengine
-
+from flask_mongoengine import MongoEngine
+from flask_jwt_extended import JWTManager
+from celery import Celery
 
 application = Flask(os.environ.get("APPLICATION_NAME"))
 SETTINGS_FILE = os.environ.get("SETTINGS_FILE", "settings.local_settings")
 
 application.config.from_object(SETTINGS_FILE)
+
+db = MongoEngine(application)
+jwt = JWTManager(application)
+
+def make_celery(app):
+    celery = Celery(
+        app.import_name,
+        backend=app.config['CELERY_SETTINGS']['celery_result_backend'],
+        broker=app.config['CELERY_SETTINGS']['celery_broker_url'],
+    )
+    celery.conf.update(app.config)
+    return celery
+
+celery = make_celery(application)
 
 with application.app_context():
     # this loads all the views with the app context
@@ -30,11 +46,12 @@ for url, view, methods, _ in all_urls:
 
 logging.config.dictConfig(application.config["LOGGING"])
 
-mongoengine.connect(
-    alias='default',
-    db=application.config['MONGO_SETTINGS']['DB_NAME'],
-    host=application.config['MONGO_SETTINGS']['DB_HOST'],
-    port=application.config['MONGO_SETTINGS']['DB_PORT'],
-    username=application.config['MONGO_SETTINGS']['DB_USERNAME'],
-    password=application.config['MONGO_SETTINGS']['DB_PASSWORD'],
-)
+
+# mongoengine.connect(
+#     alias='default',
+#     db=application.config['MONGODB_SETTINGS']['db'],
+#     host=application.config['MONGODB_SETTINGS']['host'],
+#     port=application.config['MONGODB_SETTINGS']['port'],
+#     username=application.config['MONGODB_SETTINGS']['username'],
+#     password=application.config['MONGODB_SETTINGS']['password'],
+# )
