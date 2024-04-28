@@ -6,6 +6,8 @@ import mongoengine
 from flask_mongoengine import MongoEngine
 from flask_jwt_extended import JWTManager
 from celery import Celery
+from bson import ObjectId, json_util
+import json
 
 application = Flask(os.environ.get("APPLICATION_NAME"))
 SETTINGS_FILE = os.environ.get("SETTINGS_FILE", "settings.local_settings")
@@ -26,6 +28,15 @@ def make_celery(app):
 
 celery = make_celery(application)
 
+
+class CustomJSONEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, ObjectId):
+            return str(obj)
+        return json_util.default(obj)
+
+application.json_encoder = CustomJSONEncoder
+
 with application.app_context():
     # this loads all the views with the app context
     # this is also helpful when the views import other
@@ -45,13 +56,3 @@ for url, view, methods, _ in all_urls:
 
 
 logging.config.dictConfig(application.config["LOGGING"])
-
-
-# mongoengine.connect(
-#     alias='default',
-#     db=application.config['MONGODB_SETTINGS']['db'],
-#     host=application.config['MONGODB_SETTINGS']['host'],
-#     port=application.config['MONGODB_SETTINGS']['port'],
-#     username=application.config['MONGODB_SETTINGS']['username'],
-#     password=application.config['MONGODB_SETTINGS']['password'],
-# )

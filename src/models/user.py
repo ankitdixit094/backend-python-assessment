@@ -1,7 +1,9 @@
-# from mongoengine import StringField, EmailField, Document
+from mongoengine import StringField, EmailField, Document
 from werkzeug.security import generate_password_hash, check_password_hash
-# import mongoengine as me
 from app import db
+
+
+
 
 class User(db.Document):
     """
@@ -22,3 +24,15 @@ class User(db.Document):
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
+    
+    def to_dict(self):
+        """Converts the user object to a dictionary."""
+        user_dict = {
+            'first_name': self.first_name,
+            'last_name': self.last_name,
+            'username': self.username,
+            'email': self.email,
+            'last_login': self.last_login
+        }
+        return user_dict
+

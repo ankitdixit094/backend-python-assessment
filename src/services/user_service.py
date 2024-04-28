@@ -1,7 +1,8 @@
 from app import jwt
 from models.user import User
+from utils import logger
 
-class UserService(object):
+class UserService:
     """
     service function for user related business logic
     """
@@ -17,35 +18,26 @@ class UserService(object):
 
         pass
 
-    # def create_user(self, first_name, last_name, username, email, password):
-    #     logger.info(f"first_name:{first_name}, last_name:{last_name}, username:{username}, email:{email}, password:{password}")
-    #     # Validate user data (implement proper validation)
-    #     if not first_name or not username or not email or not password:
-    #         return jsonify({"error": "Missing required fields"}), 400
-
-    #     # Check for existing user
-    #     existing_user = User.objects.filter(username=username)
-    #     if bool(existing_user):
-    #         return jsonify({"error": "Username already exists"}), 400
-
-    #     # Create new user
-    #     new_user = User(first_name=first_name, last_name=last_name, username=username, email=email)
-    #     new_user.set_password(password)
-    #     new_user.save()
+    def get_user(self, username):
+        return User.objects.filter(username=username).first()
 
 
-# Register a callback function that takes whatever object is passed in as the
-# identity when creating JWTs and converts it to a JSON serializable format.
+    def create_user(self, first_name, last_name, username, email, password):
+        # Create new user
+        new_user = User(first_name=first_name, last_name=last_name, username=username, email=email)
+        new_user.set_password(password)
+        new_user.save()
+        return new_user
+
+
 @jwt.user_identity_loader
 def user_identity_lookup(user):
+    logger.info(f"1={user}")
+    logger.info(f"1={user.id}")
     return user.id
 
-
-# Register a callback function that loads a user from your database whenever
-# a protected route is accessed. This should return any python object on a
-# successful lookup, or None if the lookup failed for any reason (for example
-# if the user has been deleted from the database).
-@jwt.user_lookup_loader
-def user_lookup_callback(_jwt_header, jwt_data):
-    identity = jwt_data["sub"]
+@jwt.user_loader_callback_loader
+def user_loader_callback(identity):
+    logger.info(f"2={identity}")
+    logger.info(f"2={identity.id}")
     return User.objects.filter(id=identity).first()

@@ -32,15 +32,6 @@ LOGGING = {
 }
 
 
-# MONGO_SETTINGS = {
-#     'DB_NAME': os.environ.get('DB_NAME'),
-#     'DB_HOST': os.environ.get('DB_HOST'),
-#     'DB_PORT': int(os.environ.get('DB_PORT', 27017)),
-#     'DB_USERNAME': os.environ.get('DB_USERNAME'),
-#     'DB_PASSWORD': os.environ.get('DB_PASSWORD'),
-# }
-
-
 MONGODB_SETTINGS = {
     'alias': 'default',
     'db': os.environ.get('DB_NAME'),

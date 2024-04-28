@@ -33,7 +33,9 @@ ALL_CLI_COMMANDS = {
 """
 
 from .tests import test_cli_command
+from .user import createuser
 
 ALL_CLI_COMMANDS = {
-    "test_command": test_cli_command
+    "test_command": test_cli_command,
+    "createuser": createuser
 }
