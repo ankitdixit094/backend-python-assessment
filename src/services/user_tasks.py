@@ -4,10 +4,7 @@ from app import celery
 from models.user import User
 from services.user_service import UserService
 
-
 logger = get_task_logger(__name__)
-
-
 
 @celery.task(name='tasks.store_last_login_info')
 def store_last_login_info(username):

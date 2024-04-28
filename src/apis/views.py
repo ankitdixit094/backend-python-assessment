@@ -31,7 +31,7 @@ def login():
     if bool(user) and user.check_password(password):
         access_token = create_access_token(identity=user)
         store_last_login_info.delay(user.username)
-        return jsonify(access_token=access_token), 200
+        return jsonify({'message':'successfully login', 'access_token':access_token, 'user': user.to_dict()}), 200
     else:
         return jsonify({'error': 'Invalid username or password'}), 401
 

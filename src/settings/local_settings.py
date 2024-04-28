@@ -41,7 +41,7 @@ MONGODB_SETTINGS = {
     'password': os.environ.get('DB_PASSWORD'),
 }
 
-JWT_SECRET_KEY="qswa6t"
+JWT_SECRET_KEY="0vvr2asm015hd^&!qdo8wz89%ejuzkc*vqjo#=51nlj!d+mah_"
 
 CELERY_SETTINGS = {
     'celery_result_backend': os.environ.get('CELERY_RESULT_BACKEND'),
